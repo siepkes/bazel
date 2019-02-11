@@ -31,6 +31,7 @@ public class CppActionConfigs {
   /** A platform for C++ tool invocations. */
   public enum CppPlatform {
     LINUX,
+    SOLARIS,
     MAC
   }
 
@@ -613,6 +614,59 @@ public class CppActionConfigs {
                             "    expand_if_true: 'libraries_to_link.is_whole_archive'",
                             "    flag: '-Wl,-no-whole-archive'",
                             "  }"),
+                        ifSolaris(
+                            platform,
+                            "  flag_group {",
+                            "    expand_if_true: 'libraries_to_link.is_whole_archive'",
+                            "    flag: '-Wl,--whole-archive'",
+                            "  }",
+                            "  flag_group {",
+                            "    expand_if_equal: {",
+                            "        variable: 'libraries_to_link.type'",
+                            "        value: 'object_file_group'",
+                            "    }",
+                            "    iterate_over: 'libraries_to_link.object_files'",
+                            "    flag: '%{libraries_to_link.object_files}'",
+                            "  }",
+                            "  flag_group {",
+                            "    expand_if_equal: {",
+                            "      variable: 'libraries_to_link.type'",
+                            "      value: 'object_file'",
+                            "    }",
+                            "    flag: '%{libraries_to_link.name}'",
+                            "  }",
+                            "  flag_group {",
+                            "    expand_if_equal: {",
+                            "      variable: 'libraries_to_link.type'",
+                            "      value: 'interface_library'",
+                            "    }",
+                            "    flag: '%{libraries_to_link.name}'",
+                            "  }",
+                            "  flag_group {",
+                            "    expand_if_equal: {",
+                            "      variable: 'libraries_to_link.type'",
+                            "      value: 'static_library'",
+                            "    }",
+                            "    flag: '%{libraries_to_link.name}'",
+                            "  }",
+                            "  flag_group {",
+                            "    expand_if_equal: {",
+                            "      variable: 'libraries_to_link.type'",
+                            "      value: 'dynamic_library'",
+                            "    }",
+                            "    flag: '-l%{libraries_to_link.name}'",
+                            "  }",
+                            "  flag_group {",
+                            "    expand_if_equal: {",
+                            "      variable: 'libraries_to_link.type'",
+                            "      value: 'versioned_dynamic_library'",
+                            "    }",
+                            "    flag: '-l:%{libraries_to_link.name}'",
+                            "  }",
+                            "  flag_group {",
+                            "    expand_if_true: 'libraries_to_link.is_whole_archive'",
+                            "    flag: '-Wl,--no-whole-archive'",
+                            "  }"),
                         ifMac(
                             platform,
                             "  flag_group {",
@@ -792,8 +846,11 @@ public class CppActionConfigs {
                         "    action: 'c++-link-dynamic-library'",
                         "    action: 'c++-link-nodeps-dynamic-library'",
                         "    flag_group {",
-                        "      expand_if_all_available: 'strip_debug_symbols'",
-                        "      flag: '-Wl,-S'",
+                        ifLinux(platform, "      flag: '-Wl,-S'"),
+                        ifMac(platform, "      flag: '-Wl,-S'"),
+                        // TODO: Figure out how to only strip debug symbols on Solaris.
+                        // 'zstrip-class' is not present on Illumos I think?
+                        //ifSolaris(platform, "      flag: '-Wl,zstrip-class=debug'"),
                         "    }",
                         "  }")));
       }
@@ -1313,6 +1370,10 @@ public class CppActionConfigs {
   private static String ifLinux(CppPlatform platform, String... lines) {
     // Platform `LINUX` also includes FreeBSD.
     return ifTrue(platform == CppPlatform.LINUX, lines);
+  }
+
+  private static String ifSolaris(CppPlatform platform, String... lines) {
+    return ifTrue(platform == CppPlatform.SOLARIS, lines);
   }
 
   private static String ifMac(CppPlatform platform, String... lines) {

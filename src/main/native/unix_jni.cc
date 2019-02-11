@@ -662,6 +662,7 @@ static jobject NewDirents(JNIEnv *env,
 static char GetDirentType(struct dirent *entry,
                           int dirfd,
                           bool follow_symlinks) {
+#ifdef _DIRENT_HAVE_D_TYPE
   switch (entry->d_type) {
     case DT_REG:
       return 'f';
@@ -673,16 +674,19 @@ static char GetDirentType(struct dirent *entry,
       }
       FALLTHROUGH_INTENDED;
     case DT_UNKNOWN:
+#endif
       portable_stat_struct statbuf;
       if (portable_fstatat(dirfd, entry->d_name, &statbuf, 0) == 0) {
         if (S_ISREG(statbuf.st_mode)) return 'f';
         if (S_ISDIR(statbuf.st_mode)) return 'd';
       }
+#ifdef _DIRENT_HAVE_D_TYPE
       // stat failed or returned something weird; fall through
       FALLTHROUGH_INTENDED;
     default:
       return '?';
   }
+#endif
 }
 
 /*

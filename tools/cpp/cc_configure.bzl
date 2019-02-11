@@ -25,6 +25,7 @@ load(
 def cc_autoconf_impl(repository_ctx, overriden_tools = dict()):
     paths = resolve_labels(repository_ctx, [
         "@bazel_tools//tools/cpp:BUILD.static.freebsd",
+        "@bazel_tools//tools/cpp:BUILD.static.solaris",
         "@bazel_tools//tools/cpp:CROSSTOOL",
         "@bazel_tools//tools/cpp:dummy_toolchain.bzl",
     ])
@@ -45,6 +46,11 @@ def cc_autoconf_impl(repository_ctx, overriden_tools = dict()):
         # skipping until we have proper tests for FreeBSD.
         repository_ctx.symlink(paths["@bazel_tools//tools/cpp:CROSSTOOL"], "CROSSTOOL")
         repository_ctx.symlink(paths["@bazel_tools//tools/cpp:BUILD.static.freebsd"], "BUILD")
+    elif cpu_value == "solaris":
+        # This is defaulting to the static crosstool, we should eventually
+        # autoconfigure this platform too. See also FreeBSD comments.
+        repository_ctx.symlink(paths["@bazel_tools//tools/cpp:CROSSTOOL"], "CROSSTOOL")
+        repository_ctx.symlink(paths["@bazel_tools//tools/cpp:BUILD.static.solaris"], "BUILD")
     elif cpu_value == "x64_windows":
         # TODO(ibiryukov): overriden_tools are only supported in configure_unix_toolchain.
         # We might want to add that to Windows too(at least for msys toolchain).

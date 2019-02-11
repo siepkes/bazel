@@ -426,8 +426,14 @@ public final class CppToolchainInfo {
           toolchain = removeLegacyCompileFlagsFeatureFromToolchain(toolchain);
         }
 
-      CppPlatform platform =
-          toolchain.getTargetLibc().equals("macosx") ? CppPlatform.MAC : CppPlatform.LINUX;
+      CppPlatform platform;
+      if (toolchain.getTargetLibc().equals("macosx")) {
+        platform = CppPlatform.MAC;
+      } else if (toolchain.getTargetLibc().equals("solaris")) {
+        platform = CppPlatform.SOLARIS;
+      } else {
+        platform = CppPlatform.LINUX;
+      }
 
       toolchainBuilder.addAllActionConfig(
           CppActionConfigs.getLegacyActionConfigs(

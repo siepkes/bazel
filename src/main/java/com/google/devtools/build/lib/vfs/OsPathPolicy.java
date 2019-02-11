@@ -87,6 +87,7 @@ public interface OsPathPolicy {
     switch (OS.getCurrent()) {
       case LINUX:
       case FREEBSD:
+      case SOLARIS:
       case UNKNOWN:
         return UnixOsPathPolicy.INSTANCE;
       case DARWIN:
