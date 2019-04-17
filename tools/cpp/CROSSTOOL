@@ -397,8 +397,6 @@ toolchain {
   linker_flag: "-lsocket"
   linker_flag: "-lnsl"
 
-  # Make the Solaris linker more talkative about what it's doing.
-  linker_flag: "-Wl,-z,verbose"
   # Make the Solaris linker behave more strictly.
   linker_flag: "-Wl,-z,text"
   # Make the Solaris linker rescan the archive files that are provided to the link-edit.
@@ -473,6 +471,9 @@ toolchain {
 
   # Keep stack frames for debugging, even in opt mode.
   compiler_flag: "-fno-omit-frame-pointer"
+
+  # Create position independent code.
+  compiler_flag: "-fpic"
 
   compilation_mode_flags {
     mode: DBG
