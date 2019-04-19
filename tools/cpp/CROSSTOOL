@@ -393,6 +393,17 @@ toolchain {
 
   # TODO: These are actually just required by depdencies (sub project) like protobuf (js_embed).
   # Shouldn't be in the normal tool chain.
+  #
+  # gcc_s is here because it needs to be pulled in _before_ libc gets pulled in. Libraries
+  # like libxnet pull in libc so therefor we need to explicitly put libgcc_s before them.
+  # If we don't we run in to the problem that GCC's exception support (in libgcc_s) gets overriden
+  # by Illumos' libc exception support (in libc). This leads to the situation where exceptions
+  # don't work for a GCC compiled application. Applications will simply terminate when an 
+  # exception is thrown. For more info see:
+  # - https://paulbeachsblog.blogspot.com/2008/03/exceptions-gcc-and-solaris-10-amd-64bit.html
+  # - https://stackoverflow.com/questions/27490165/sun-studio-linking-gcc-libs-exceptions-do-not-work#
+  # - https://blogs.datalogics.com/2013/06/26/2013-june-dle-intel-solaris-64-mystery/
+  linker_flag: "-lgcc_s"
   linker_flag: "-lxnet"
   linker_flag: "-lsocket"
   linker_flag: "-lnsl"
