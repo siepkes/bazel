@@ -25,6 +25,7 @@ load(
 def cc_autoconf_impl(repository_ctx, overriden_tools = dict()):
     paths = resolve_labels(repository_ctx, [
         "@bazel_tools//tools/cpp:BUILD.static.freebsd",
+        "@bazel_tools//tools/cpp:BUILD.static.solaris",
         "@bazel_tools//tools/cpp:cc_toolchain_config.bzl",
     ])
 
@@ -40,6 +41,9 @@ def cc_autoconf_impl(repository_ctx, overriden_tools = dict()):
         # skipping until we have proper tests for FreeBSD.
         repository_ctx.symlink(paths["@bazel_tools//tools/cpp:cc_toolchain_config.bzl"], "cc_toolchain_config.bzl")
         repository_ctx.symlink(paths["@bazel_tools//tools/cpp:BUILD.static.freebsd"], "BUILD")
+    elif cpu_value == "solaris":
+        repository_ctx.symlink(paths["@bazel_tools//tools/cpp:cc_toolchain_config.bzl"], "cc_toolchain_config.bzl")
+        repository_ctx.symlink(paths["@bazel_tools//tools/cpp:BUILD.static.solaris"], "BUILD")
     elif cpu_value == "x64_windows":
         # TODO(ibiryukov): overriden_tools are only supported in configure_unix_toolchain.
         # We might want to add that to Windows too(at least for msys toolchain).

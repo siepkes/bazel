@@ -93,6 +93,10 @@ freebsd)
   JAVA_HOME="${JAVA_HOME:-/usr/local/openjdk8}"
   ;;
 
+solaris)
+  JAVA_HOME="${JAVA_HOME:-/opt/local/java/openjdk8}"
+  ;;
+
 darwin)
   if [[ -z "$JAVA_HOME" ]]; then
     JAVA_HOME="$(/usr/libexec/java_home -v ${JAVA_VERSION}+ 2> /dev/null)" \

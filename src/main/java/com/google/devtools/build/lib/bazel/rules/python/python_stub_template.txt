@@ -41,7 +41,8 @@ if IsWindows() and not HasWindowsExecutableExtension(PYTHON_BINARY):
 
 # Find a file in a given search path.
 def SearchPath(name):
-  search_path = os.getenv('PATH', os.defpath).split(os.pathsep)
+  # TODO: Modified for SmartOS + pkgsrc. Is this the right way?
+  search_path = os.getenv('PATH', os.defpath + ":/opt/local/bin").split(os.pathsep)
   for directory in search_path:
     if directory == '': continue
     path = os.path.join(directory, name)

@@ -56,6 +56,11 @@ constraint_value(
 )
 
 constraint_value(
+    name = "solaris",
+    constraint_setting = ":os",
+)
+
+constraint_value(
     name = "android",
     constraint_setting = ":os",
 )
@@ -91,6 +96,7 @@ platform(
     os_constraints = [
         ":osx",
         ":freebsd",
+        ":solaris",
         ":linux",
         ":windows",
     ],
@@ -111,6 +117,7 @@ platform(
     os_constraints = [
         ":osx",
         ":freebsd",
+        ":solaris",
         ":linux",
         ":windows",
     ],

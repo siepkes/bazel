@@ -243,10 +243,14 @@ public final class CppToolchainInfo {
       }
       toolchain = removeSpecialFeatureFromToolchain(toolchain);
 
-      CppPlatform platform =
-          toolchain.getTargetLibc().equals(CppActionConfigs.MACOS_TARGET_LIBC)
-              ? CppPlatform.MAC
-              : CppPlatform.LINUX;
+      CppPlatform platform;
+      if (toolchain.getTargetLibc().equals(CppActionConfigs.MACOS_TARGET_LIBC)) {
+        platform = CppPlatform.MAC;
+      } else if (toolchain.getTargetLibc().equals(CppActionConfigs.SOLARIS_TARGET_LIBC)) {
+        platform = CppPlatform.SOLARIS;
+      } else {
+        platform = CppPlatform.LINUX;
+      }
 
       toolchainBuilder.addAllActionConfig(
           CppActionConfigs.getLegacyActionConfigs(

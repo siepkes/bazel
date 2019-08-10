@@ -138,6 +138,15 @@ def grpc_cc_library(
                 "-std=c99",
                 "-Wimplicit-function-declaration",
             ],
+            "//src/conditions:solaris": [
+                # Needed for 'msg_control' in 'msghdr'.
+                "-D_XOPEN_SOURCE=600",
+                # Needed for 'IPV6_V6ONLY' in 'in.h'.
+                "-D__EXTENSIONS__",
+                # Must be c99 otherwise 'feature_tests.h' will complain.
+                "-std=c99",
+                "-Wimplicit-function-declaration",
+            ],            
             ":windows": ["/we4013"],
         })
     native.cc_library(

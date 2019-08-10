@@ -30,6 +30,10 @@ cc_library(
             "blaze_util_freebsd.cc",
             "blaze_util_posix.cc",
         ],
+        "//src/conditions:solaris": [
+            "blaze_util_solaris.cc",
+            "blaze_util_posix.cc",
+        ],
         "//src/conditions:windows": [
             "blaze_util_windows.cc",
         ],
@@ -50,6 +54,8 @@ cc_library(
             "-framework CoreFoundation",
         ],
         "//src/conditions:freebsd": [
+        ],
+        "//src/conditions:solaris": [
         ],
         "//src/conditions:windows": WIN_LINK_OPTS,
         "//conditions:default": [
@@ -94,6 +100,8 @@ cc_binary(
         "//src/conditions:freebsd": [
             "-lprocstat",
             "-lm",
+        ],
+        "//src/conditions:solaris": [
         ],
         "//src/conditions:windows": [
         ],

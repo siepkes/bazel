@@ -685,6 +685,11 @@ config_setting(
 )
 
 config_setting(
+    name = "solaris",
+    values = {"host_cpu": "solaris"},
+)
+
+config_setting(
     name = "s390x",
     values = {"host_cpu": "s390x"},
 )

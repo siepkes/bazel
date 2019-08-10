@@ -103,6 +103,8 @@ def _impl(ctx):
         toolchain_identifier = "local_darwin"
     elif (ctx.attr.cpu == "freebsd"):
         toolchain_identifier = "local_freebsd"
+    elif (ctx.attr.cpu == "solaris"):
+        toolchain_identifier = "local_solaris"        
     elif (ctx.attr.cpu == "local"):
         toolchain_identifier = "local_linux"
     elif (ctx.attr.cpu == "x64_windows" and ctx.attr.compiler == "windows_clang"):
@@ -124,6 +126,7 @@ def _impl(ctx):
         host_system_name = "armeabi-v7a"
     elif (ctx.attr.cpu == "darwin" or
           ctx.attr.cpu == "freebsd" or
+          ctx.attr.cpu == "solaris" or          
           ctx.attr.cpu == "local" or
           ctx.attr.cpu == "x64_windows" or
           ctx.attr.cpu == "x64_windows_msvc"):
@@ -135,6 +138,7 @@ def _impl(ctx):
         target_system_name = "armeabi-v7a"
     elif (ctx.attr.cpu == "darwin" or
           ctx.attr.cpu == "freebsd" or
+          ctx.attr.cpu == "solaris" or          
           ctx.attr.cpu == "local" or
           ctx.attr.cpu == "x64_windows" or
           ctx.attr.cpu == "x64_windows_msvc"):
@@ -148,6 +152,8 @@ def _impl(ctx):
         target_cpu = "darwin"
     elif (ctx.attr.cpu == "freebsd"):
         target_cpu = "freebsd"
+    elif (ctx.attr.cpu == "solaris"):
+        target_cpu = "solaris"        
     elif (ctx.attr.cpu == "local"):
         target_cpu = "local"
     elif (ctx.attr.cpu == "x64_windows"):
@@ -159,10 +165,12 @@ def _impl(ctx):
 
     if (ctx.attr.cpu == "armeabi-v7a"):
         target_libc = "armeabi-v7a"
+    elif (ctx.attr.cpu == "solaris"):
+        target_libc = "solaris"        
     elif (ctx.attr.cpu == "freebsd" or
           ctx.attr.cpu == "local" or
           ctx.attr.cpu == "x64_windows"):
-        target_libc = "local"
+        target_libc = "local"    
     elif (ctx.attr.cpu == "darwin"):
         target_libc = "macosx"
     elif (ctx.attr.cpu == "x64_windows_msvc"):
@@ -174,6 +182,7 @@ def _impl(ctx):
         compiler = "cl"
     elif (ctx.attr.cpu == "armeabi-v7a" or
           ctx.attr.cpu == "darwin" or
+          ctx.attr.cpu == "solaris" or          
           ctx.attr.cpu == "freebsd" or
           ctx.attr.cpu == "local"):
         compiler = "compiler"
@@ -192,6 +201,7 @@ def _impl(ctx):
         abi_version = "armeabi-v7a"
     elif (ctx.attr.cpu == "darwin" or
           ctx.attr.cpu == "freebsd" or
+          ctx.attr.cpu == "solaris" or          
           ctx.attr.cpu == "local" or
           ctx.attr.cpu == "x64_windows" or
           ctx.attr.cpu == "x64_windows_msvc"):
@@ -203,6 +213,7 @@ def _impl(ctx):
         abi_libc_version = "armeabi-v7a"
     elif (ctx.attr.cpu == "darwin" or
           ctx.attr.cpu == "freebsd" or
+          ctx.attr.cpu == "solaris" or          
           ctx.attr.cpu == "local" or
           ctx.attr.cpu == "x64_windows" or
           ctx.attr.cpu == "x64_windows_msvc"):
@@ -222,6 +233,12 @@ def _impl(ctx):
             enabled = True,
             tools = [tool(path = "/usr/bin/objcopy")],
         )
+    elif (ctx.attr.cpu == "solaris"):
+        objcopy_embed_data_action = action_config(
+            action_name = "objcopy_embed_data",
+            enabled = True,
+            tools = [tool(path = "/opt/local/bin/objcopy")],
+        )    
     elif (ctx.attr.cpu == "x64_windows" and ctx.attr.compiler == "windows_clang"):
         objcopy_embed_data_action = action_config(
             action_name = "objcopy_embed_data",
@@ -279,6 +296,7 @@ def _impl(ctx):
         action_configs = [c_compile_action, cpp_compile_action]
     elif (ctx.attr.cpu == "darwin" or
           ctx.attr.cpu == "freebsd" or
+          ctx.attr.cpu == "solaris" or          
           ctx.attr.cpu == "local" or
           ctx.attr.cpu == "x64_windows"):
         action_configs = [objcopy_embed_data_action]
@@ -377,6 +395,46 @@ def _impl(ctx):
                 ),
             ],
         )
+    elif (ctx.attr.cpu == "solaris"):
+        default_link_flags_feature = feature(
+            name = "default_link_flags",
+            enabled = True,
+            flag_sets = [
+                flag_set(
+                    actions = all_link_actions,
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                # gcc_s is here because it needs to be pulled in _before_ libc gets pulled in. Libraries
+                                # like libxnet pull in libc so therefor we need to explicitly put libgcc_s before them.
+                                # If we don't we run in to the problem that GCC's exception support (in libgcc_s) gets overriden
+                                # by Illumos' libc exception support (in libc). This leads to the situation where exceptions
+                                # don't work for a GCC compiled application. Applications will simply terminate when an 
+                                # exception is thrown. For more info see:
+                                # - https://paulbeachsblog.blogspot.com/2008/03/exceptions-gcc-and-solaris-10-amd-64bit.html
+                                # - https://stackoverflow.com/questions/27490165/sun-studio-linking-gcc-libs-exceptions-do-not-work#
+                                # - https://blogs.datalogics.com/2013/06/26/2013-june-dle-intel-solaris-64-mystery/
+                                "-lgcc_s",
+                                "-lxnet",
+                                "-lsocket",
+                                "-lnsl",
+                                "-lstdc++",
+                                # Create position independent code.
+                                "-fpic",
+                                # Make the Solaris linker behave less strict. By default it uses '-ztext'. This caused some issues
+                                # with Envoy.
+                                # TODO: This doesn't belong here. Solve this properly.
+                                "-Wl,-z,textoff",
+                                # Remove the default '-ztext' flag which conflicts with '-ztextoff'.
+                                "-mimpure-text",
+                                # Make the Solaris linker rescan the archive files that are provided to the link-edit.
+                                "-Wl,-z,rescan",
+                            ],
+                        ),
+                    ],
+                )
+            ],
+        )        
     elif (ctx.attr.cpu == "darwin"):
         default_link_flags_feature = feature(
             name = "default_link_flags",
@@ -454,6 +512,39 @@ def _impl(ctx):
                 ),
             ],
         )
+    elif (ctx.attr.cpu == "solaris"):
+        unfiltered_compile_flags_feature = feature(
+            name = "unfiltered_compile_flags",
+            enabled = True,
+            flag_sets = [
+                flag_set(
+                    actions = [
+                        _ASSEMBLE_ACTION_NAME,
+                        _PREPROCESS_ASSEMBLE_ACTION_NAME,
+                        _LINKSTAMP_COMPILE_ACTION_NAME,
+                        _C_COMPILE_ACTION_NAME,
+                        _CPP_COMPILE_ACTION_NAME,
+                        _CPP_HEADER_PARSING_ACTION_NAME,
+                        _CPP_MODULE_COMPILE_ACTION_NAME,
+                        _CPP_MODULE_CODEGEN_ACTION_NAME,
+                        _LTO_BACKEND_ACTION_NAME,
+                        _CLIF_MATCH_ACTION_NAME,
+                    ],
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                "-no-canonical-prefixes",
+                                "-fno-canonical-system-headers",
+                                "-Wno-builtin-macro-redefined",
+                                "-D__DATE__=\"redacted\"",
+                                "-D__TIMESTAMP__=\"redacted\"",
+                                "-D__TIME__=\"redacted\"",
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+        )        
     elif (ctx.attr.cpu == "local"):
         unfiltered_compile_flags_feature = feature(
             name = "unfiltered_compile_flags",
@@ -690,6 +781,93 @@ def _impl(ctx):
                 ),
             ],
         )
+    elif (ctx.attr.cpu == "solaris"):
+        default_compile_flags_feature = feature(
+            name = "default_compile_flags",
+            enabled = True,
+            flag_sets = [
+                flag_set(
+                    actions = [
+                        _ASSEMBLE_ACTION_NAME,
+                        _PREPROCESS_ASSEMBLE_ACTION_NAME,
+                        _LINKSTAMP_COMPILE_ACTION_NAME,
+                        _C_COMPILE_ACTION_NAME,
+                        _CPP_COMPILE_ACTION_NAME,
+                        _CPP_HEADER_PARSING_ACTION_NAME,
+                        _CPP_MODULE_COMPILE_ACTION_NAME,
+                        _CPP_MODULE_CODEGEN_ACTION_NAME,
+                        _LTO_BACKEND_ACTION_NAME,
+                        _CLIF_MATCH_ACTION_NAME,
+                    ],
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                "-U_FORTIFY_SOURCE",
+                                "-D_FORTIFY_SOURCE=1",
+                                # TODO: Does Solaris support this?
+                                #"-fstack-protector",
+                                "-Wall",
+                                "-fno-omit-frame-pointer",
+                            ],
+                        ),
+                    ],
+                ),
+                flag_set(
+                    actions = [
+                        _ASSEMBLE_ACTION_NAME,
+                        _PREPROCESS_ASSEMBLE_ACTION_NAME,
+                        _LINKSTAMP_COMPILE_ACTION_NAME,
+                        _C_COMPILE_ACTION_NAME,
+                        _CPP_COMPILE_ACTION_NAME,
+                        _CPP_HEADER_PARSING_ACTION_NAME,
+                        _CPP_MODULE_COMPILE_ACTION_NAME,
+                        _CPP_MODULE_CODEGEN_ACTION_NAME,
+                        _LTO_BACKEND_ACTION_NAME,
+                        _CLIF_MATCH_ACTION_NAME,
+                    ],
+                    flag_groups = [flag_group(flags = ["-g"])],
+                    with_features = [with_feature_set(features = ["dbg"])],
+                ),
+                flag_set(
+                    actions = [
+                        _ASSEMBLE_ACTION_NAME,
+                        _PREPROCESS_ASSEMBLE_ACTION_NAME,
+                        _LINKSTAMP_COMPILE_ACTION_NAME,
+                        _C_COMPILE_ACTION_NAME,
+                        _CPP_COMPILE_ACTION_NAME,
+                        _CPP_HEADER_PARSING_ACTION_NAME,
+                        _CPP_MODULE_COMPILE_ACTION_NAME,
+                        _CPP_MODULE_CODEGEN_ACTION_NAME,
+                        _LTO_BACKEND_ACTION_NAME,
+                        _CLIF_MATCH_ACTION_NAME,
+                    ],
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                "-g0",
+                                "-O2",
+                                "-DNDEBUG",
+                                "-ffunction-sections",
+                                "-fdata-sections",
+                            ],
+                        ),
+                    ],
+                    with_features = [with_feature_set(features = ["opt"])],
+                ),
+                flag_set(
+                    actions = [
+                        _LINKSTAMP_COMPILE_ACTION_NAME,
+                        _CPP_COMPILE_ACTION_NAME,
+                        _CPP_HEADER_PARSING_ACTION_NAME,
+                        _CPP_MODULE_COMPILE_ACTION_NAME,
+                        _CPP_MODULE_CODEGEN_ACTION_NAME,
+                        _LTO_BACKEND_ACTION_NAME,
+                        _CLIF_MATCH_ACTION_NAME,
+                    ],
+                    flag_groups = [flag_group(flags = ["-std=c++0x"])],
+                ),
+            ],
+        )        
     elif (ctx.attr.cpu == "freebsd"):
         default_compile_flags_feature = feature(
             name = "default_compile_flags",
@@ -946,6 +1124,7 @@ def _impl(ctx):
 
     if (ctx.attr.cpu == "darwin" or
         ctx.attr.cpu == "freebsd" or
+        ctx.attr.cpu == "solaris" or
         ctx.attr.cpu == "local"):
         user_compile_flags_feature = feature(
             name = "user_compile_flags",
@@ -1001,6 +1180,7 @@ def _impl(ctx):
 
     if (ctx.attr.cpu == "darwin" or
         ctx.attr.cpu == "freebsd" or
+        ctx.attr.cpu == "solaris" or
         ctx.attr.cpu == "local"):
         sysroot_feature = feature(
             name = "sysroot",
@@ -1156,6 +1336,19 @@ def _impl(ctx):
             sysroot_feature,
             unfiltered_compile_flags_feature,
         ]
+    elif (ctx.attr.cpu == "solaris"):
+        features = [
+            default_compile_flags_feature,
+            default_link_flags_feature,
+            supports_dynamic_linker_feature,
+            supports_pic_feature,
+            objcopy_embed_flags_feature,
+            opt_feature,
+            dbg_feature,
+            user_compile_flags_feature,
+            sysroot_feature,
+            unfiltered_compile_flags_feature,
+        ]
     elif (ctx.attr.cpu == "freebsd" or
           ctx.attr.cpu == "local"):
         features = [
@@ -1169,7 +1362,7 @@ def _impl(ctx):
             user_compile_flags_feature,
             sysroot_feature,
             unfiltered_compile_flags_feature,
-        ]
+        ]        
     elif (ctx.attr.cpu == "x64_windows" and ctx.attr.compiler == "windows_clang" or
           ctx.attr.cpu == "x64_windows" and ctx.attr.compiler == "windows_mingw" or
           ctx.attr.cpu == "x64_windows" and ctx.attr.compiler == "windows_msys64_mingw64"):
@@ -1203,6 +1396,9 @@ def _impl(ctx):
         cxx_builtin_include_directories = ["/"]
     elif (ctx.attr.cpu == "freebsd"):
         cxx_builtin_include_directories = ["/usr/lib/clang", "/usr/local/include", "/usr/include"]
+    elif (ctx.attr.cpu == "solaris"):
+        # Paths obtained with '/opt/local/gcc7/bin/g++ -E -x c++ - -v < /dev/null'.
+        cxx_builtin_include_directories = ["/opt/local/gcc7/include/c++", "/opt/local/gcc7/include/c++/x86_64-sun-solaris2.11", "/opt/local/gcc7/include/c++/backward", "/opt/local/gcc7/lib/gcc/x86_64-sun-solaris2.11/7.3.0/include", "/opt/local/include", "/opt/local/gcc7/include", "/opt/local/gcc7/lib/gcc/x86_64-sun-solaris2.11/7.3.0/include-fixed", "/usr/include"]        
     elif (ctx.attr.cpu == "local" or
           ctx.attr.cpu == "x64_windows" and ctx.attr.compiler == "windows_clang"):
         cxx_builtin_include_directories = ["/usr/lib/gcc/", "/usr/local/include", "/usr/include"]
@@ -1316,6 +1512,22 @@ def _impl(ctx):
             tool_path(name = "objdump", path = "/usr/bin/objdump"),
             tool_path(name = "strip", path = "/usr/bin/strip"),
         ]
+    elif (ctx.attr.cpu == "solaris"):
+        tool_paths = [
+            # Need GNU ar for the '-D' flag.
+            tool_path(name = "ar", path = "/usr/bin/ar"),
+            tool_path(name = "compat-ld", path = "/usr/bin/ld"),
+            tool_path(name = "cpp", path = "/opt/local/gcc7/bin/cpp"),
+            # Does not exist on Solaris.
+            tool_path(name = "dwp", path = "/usr/bin/dwp"),
+            tool_path(name = "gcc", path = "/opt/local/gcc7/bin/gcc"),
+            tool_path(name = "gcov", path = "/opt/local/gcc7/bin/gcov"),
+            tool_path(name = "ld", path = "/usr/bin/ld"),
+            tool_path(name = "nm", path = "/usr/bin/nm"),
+            tool_path(name = "objcopy", path = "/opt/local/bin/objcopy"),
+            tool_path(name = "objdump", path = "/opt/local/bin/objdump"),
+            tool_path(name = "strip", path = "/opt/local/bin/strip"),
+        ]        
     elif (ctx.attr.cpu == "darwin"):
         tool_paths = [
             tool_path(name = "ar", path = "/usr/bin/libtool"),

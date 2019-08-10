@@ -752,10 +752,15 @@ public abstract class CcModule
         }
       }
 
-      CppPlatform platform =
-          targetLibc.equals(CppActionConfigs.MACOS_TARGET_LIBC)
-              ? CppPlatform.MAC
-              : CppPlatform.LINUX;
+      CppPlatform platform;
+      if (targetLibc.equals(CppActionConfigs.MACOS_TARGET_LIBC)) {
+        platform = CppPlatform.MAC;
+      } else if (targetLibc.equals(CppActionConfigs.SOLARIS_TARGET_LIBC)) {
+        platform = CppPlatform.SOLARIS;
+      } else {
+        platform = CppPlatform.LINUX;
+      }
+
       for (CToolchain.Feature feature :
           CppActionConfigs.getLegacyFeatures(
               platform,
