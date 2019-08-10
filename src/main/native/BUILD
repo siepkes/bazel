@@ -6,6 +6,7 @@ genrule(
         "//src/conditions:darwin": ["//tools/jdk:jni_md_header-darwin"],
         "//src/conditions:darwin_x86_64": ["//tools/jdk:jni_md_header-darwin"],
         "//src/conditions:freebsd": ["//tools/jdk:jni_md_header-freebsd"],
+        "//src/conditions:solaris": ["//tools/jdk:jni_md_header-solaris"],
         "//src/conditions:windows": ["//tools/jdk:jni_md_header-windows"],
         "//conditions:default": ["//tools/jdk:jni_md_header-linux"],
     }),
@@ -34,6 +35,7 @@ filegroup(
             "fsevents.cc",
         ],
         "//src/conditions:freebsd": ["unix_jni_freebsd.cc"],
+        "//src/conditions:solaris": ["unix_jni_solaris.cc"],
         "//conditions:default": ["unix_jni_linux.cc"],
     }),
 )

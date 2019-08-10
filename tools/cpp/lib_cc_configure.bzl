@@ -184,6 +184,8 @@ def get_cpu_value(repository_ctx):
         return "darwin"
     if os_name.find("freebsd") != -1:
         return "freebsd"
+    if os_name.find("sunos") != -1:
+        return "solaris"
     if os_name.find("windows") != -1:
         return "x64_windows"
 

@@ -102,6 +102,7 @@ cc_toolchain_suite(
         "armeabi-v7a|compiler": ":cc-compiler-armeabi-v7a",
         "darwin|compiler": ":cc-compiler-darwin",
         "freebsd|compiler": ":cc-compiler-freebsd",
+        "solaris|compiler": ":cc-compiler-solaris",
         "local|compiler": ":cc-compiler-local",
         "x64_windows|compiler": ":cc-compiler-x64_windows",
         "x64_windows_msvc|compiler": ":cc-compiler-x64_windows_msvc",
@@ -116,6 +117,7 @@ cc_toolchain_suite(
         "ppc64": ":cc-compiler-local",
         "darwin": ":cc-compiler-darwin",
         "freebsd": ":cc-compiler-freebsd",
+        "solaris": ":cc-compiler-solaris",
         "armeabi-v7a": ":cc-compiler-armeabi-v7a",
         "x64_windows": ":cc-compiler-x64_windows",
         "x64_windows_msvc": ":cc-compiler-x64_windows_msvc",
@@ -342,6 +344,41 @@ toolchain(
         "@platforms//os:freebsd",
     ],
     toolchain = ":cc-compiler-freebsd",
+    toolchain_type = ":toolchain_type",
+)
+
+cc_toolchain(
+    name = "cc-compiler-solaris",
+    all_files = ":empty",
+    ar_files = ":empty",
+    as_files = ":empty",
+    compiler_files = ":empty",
+    dwp_files = ":empty",
+    linker_files = ":empty",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = 0,
+    toolchain_config = ":local_solaris",
+    toolchain_identifier = "local_solaris",
+)
+
+cc_toolchain_config(
+    name = "local_solaris",
+    compiler = "compiler",
+    cpu = "solaris",
+)
+
+toolchain(
+    name = "cc-toolchain-solaris",
+    exec_compatible_with = [
+        "@bazel_tools//platforms:x86_64",
+        "@bazel_tools//platforms:solaris",
+    ],
+    target_compatible_with = [
+        "@bazel_tools//platforms:x86_64",
+        "@bazel_tools//platforms:solaris",
+    ],
+    toolchain = ":cc-compiler-solaris",
     toolchain_type = ":toolchain_type",
 )
 

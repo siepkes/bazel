@@ -45,6 +45,11 @@ bind(
 )
 
 bind(
+    name = "jni_md_header-solaris",
+    actual = "@local_jdk//:jni_md_header-solaris",
+)
+
+bind(
     name = "java",
     actual = "@local_jdk//:java",
 )

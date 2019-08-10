@@ -38,6 +38,7 @@ def cc_autoconf_toolchains_impl(repository_ctx):
     """
     paths = resolve_labels(repository_ctx, [
         "@bazel_tools//tools/cpp:BUILD.toolchains.tpl",
+        "@bazel_tools//tools/cpp:BUILD.static.solaris",
         "@bazel_tools//tools/osx/crosstool:BUILD.toolchains",
         "@bazel_tools//tools/osx/crosstool:osx_archs.bzl",
         "@bazel_tools//tools/osx:xcode_locator.m",
@@ -114,6 +115,14 @@ def cc_autoconf_impl(repository_ctx, overriden_tools = dict()):
         # skipping until we have proper tests for FreeBSD.
         repository_ctx.symlink(paths["@bazel_tools//tools/cpp:freebsd_cc_toolchain_config.bzl"], "cc_toolchain_config.bzl")
         repository_ctx.symlink(paths["@bazel_tools//tools/cpp:BUILD.static.freebsd"], "BUILD")
+    elif cpu_value == "solaris":
+        paths = resolve_labels(repository_ctx, [
+            "@bazel_tools//tools/cpp:BUILD.static.solaris",
+            "@bazel_tools//tools/cpp:empty_cc_toolchain_config.bzl",            
+        ])
+
+        repository_ctx.symlink(paths["@bazel_tools//tools/cpp:empty_cc_toolchain_config.bzl"], "cc_toolchain_config.bzl")
+        repository_ctx.symlink(paths["@bazel_tools//tools/cpp:BUILD.static.solaris"], "BUILD")
     elif cpu_value == "x64_windows":
         # TODO(ibiryukov): overriden_tools are only supported in configure_unix_toolchain.
         # We might want to add that to Windows too(at least for msys toolchain).

@@ -33,6 +33,11 @@ filegroup(
 )
 
 filegroup(
+    name = "jni_md_header-solaris",
+    srcs = ["include/solaris/jni_md.h"],
+)
+
+filegroup(
     name = "jni_md_header-windows",
     srcs = ["include/win32/jni_md.h"],
     deprecation = DEPRECATION_MESSAGE,

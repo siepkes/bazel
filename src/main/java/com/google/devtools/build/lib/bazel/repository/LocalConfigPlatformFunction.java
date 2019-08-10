@@ -129,6 +129,8 @@ public class LocalConfigPlatformFunction extends RepositoryFunction {
         return "@platforms//os:osx";
       case FREEBSD:
         return "@platforms//os:freebsd";
+      case SOLARIS:
+        return "@platforms//os:solaris";        
       case LINUX:
         return "@platforms//os:linux";
       case WINDOWS:
