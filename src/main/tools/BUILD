@@ -68,6 +68,7 @@ cc_binary(
         "//src/conditions:darwin_x86_64": ["dummy-sandbox.c"],
         "//src/conditions:freebsd": ["dummy-sandbox.c"],
         "//src/conditions:openbsd": ["dummy-sandbox.c"],
+        "//src/conditions:illumos": ["dummy-sandbox.c"],
         "//src/conditions:windows": ["dummy-sandbox.c"],
         "//conditions:default": [
             "linux-sandbox.cc",
@@ -84,6 +85,7 @@ cc_binary(
         "//src/conditions:darwin_x86_64": [],
         "//src/conditions:freebsd": [],
         "//src/conditions:openbsd": [],
+        "//src/conditions:illumos": [],
         "//src/conditions:windows": [],
         "//conditions:default": [
             ":logging",

@@ -121,6 +121,12 @@ java_runtime_files(
     srcs = ["include/openbsd/jni_md.h"],
 )
 
+java_runtime_files(
+    name = "jni_md_header-illumos",
+    # OpenJDK doesn't make a distinction between Solaris and Illumos (yet).
+    srcs = ["include/solaris/jni_md.h"],
+)
+
 alias(
     name = "java",
     actual = "@local_jdk//:java",

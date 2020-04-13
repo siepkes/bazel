@@ -353,6 +353,8 @@ public class GrpcServerImpl extends CommandServerGrpc.CommandServerImplBase impl
       throws IOException {
     Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdownHook()));
 
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
+
     // server.pid was written in the C++ launcher after fork() but before exec() .
     // The client only accesses the pid file after connecting to the socket
     // which ensures that it gets the correct pid value.
@@ -466,6 +468,7 @@ public class GrpcServerImpl extends CommandServerGrpc.CommandServerImplBase impl
 
   private void writeServerStatusFiles(InetSocketAddress address) throws IOException {
     String addressString = InetAddresses.toUriString(address.getAddress()) + ":" + server.getPort();
+
     writeServerFile(PORT_FILE, addressString);
     writeServerFile(REQUEST_COOKIE_FILE, requestCookie);
     writeServerFile(RESPONSE_COOKIE_FILE, responseCookie);
@@ -617,6 +620,14 @@ public class GrpcServerImpl extends CommandServerGrpc.CommandServerImplBase impl
           BlazeCommandResult.failureDetail(
               FailureDetailUtil.interrupted(InterruptedCode.INTERRUPTED_UNSPECIFIED));
       commandId = ""; // The default value, the client will ignore it
+    } catch (Exception e) {
+      try {
+        java.nio.file.Files.write(java.nio.file.Paths.get("/tmp/bazel_exception.txt"), e.toString().getBytes());      
+      } catch (Exception e2) {
+        e2.printStackTrace();
+      }
+
+      throw e;
     }
 
     RunResponse.Builder response = RunResponse.newBuilder()
@@ -696,4 +707,12 @@ public class GrpcServerImpl extends CommandServerGrpc.CommandServerImplBase impl
       logger.info("Client cancelled RPC of cancellation request for " + request.getCommandId());
     }
   }
+
+  	private static final class UncaughtExceptionLogger implements Thread.UncaughtExceptionHandler {
+		@Override
+		public void uncaughtException(Thread thread, Throwable e) {
+			System.err.println("Thread '" + thread.getName() + "' with id " + thread.getId() + " exited because of an uncaught exception.");
+      e.printStackTrace();
+		}
+	}
 }

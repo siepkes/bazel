@@ -886,6 +886,8 @@ static void StartServerAndConnect(
       server->ProcessInfo().jvm_log_file_append_, startup_options.install_base,
       server_dir, startup_options, &server_startup);
 
+  BAZEL_LOG(USER) << "Local server PID:" << server_pid;
+
   ConnectOrDie(
       option_processor, startup_options, server_pid, server_startup, server);
 
@@ -1271,7 +1273,8 @@ static ATTRIBUTE_NORETURN void RunClientServerMode(
       // actually different because the two processes have different mount
       // tables.
       BAZEL_LOG(INFO) << "Server's cwd moved or deleted ("
-                      << server_cwd->AsPrintablePath() << ").";
+                      << server_cwd->AsPrintablePath() << ") - ("
+                      << workspace << ") Server PID: " << server->ProcessInfo().server_pid_;
       server->KillRunningServer();
     } else {
       break;

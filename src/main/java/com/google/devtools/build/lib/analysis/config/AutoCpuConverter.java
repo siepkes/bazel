@@ -37,6 +37,8 @@ public class AutoCpuConverter implements Converter<String> {
           return "darwin";
         case FREEBSD:
           return "freebsd";
+        case ILLUMOS:
+          return "illumos";          
         case OPENBSD:
           return "openbsd";
         case WINDOWS:
@@ -83,6 +85,8 @@ public class AutoCpuConverter implements Converter<String> {
       return Pair.of(CPU.getCurrent(), OS.DARWIN);
     } else if (input.startsWith("freebsd")) {
       return Pair.of(CPU.getCurrent(), OS.FREEBSD);
+    } else if (input.startsWith("illumos")) {
+      return Pair.of(CPU.getCurrent(), OS.ILLUMOS);      
     } else if (input.startsWith("openbsd")) {
       return Pair.of(CPU.getCurrent(), OS.OPENBSD);
     } else if (input.startsWith("x64_windows")) {

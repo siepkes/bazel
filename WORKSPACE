@@ -154,7 +154,7 @@ distdir_tar(
         "0.16.2.zip",
         "android_tools_pkg-0.14.tar.gz",
         # bazelbuild/platforms
-        "46993efdd33b73649796c5fc5c9efb193ae19d51.zip",
+        "3797fb623ef179ee131dbbde09af0eb96574fb6d.zip",
         # bazelbuild/rules_java
         "7cf3cefd652008d0a64a419c34c13bdca6c8f178.zip",
         # bazelbuild/rules_cc
@@ -179,7 +179,7 @@ distdir_tar(
         "0.16.2.zip": "9b72bb0aea72d7cbcfc82a01b1e25bf3d85f791e790ddec16c65e2d906382ee0",
         "android_tools_pkg-0.14.tar.gz": "a3a951838448483e7af25afd10671b266cc6283104b4a2a427d31cac12cf0912",  # built at 6c63d70ef9c11a662b8323c0ae4f6d3ac53b1a60
         # bazelbuild/platforms
-        "46993efdd33b73649796c5fc5c9efb193ae19d51.zip": "66184688debeeefcc2a16a2f80b03f514deac8346fe888fb7e691a52c023dd88",
+        "3797fb623ef179ee131dbbde09af0eb96574fb6d.zip": "cbb55c9290bbdcff31a7d1b852662fa2e7378d7b5b7f52afbf1b3e710b8cf841",
         # bazelbuild/rules_java
         "7cf3cefd652008d0a64a419c34c13bdca6c8f178.zip": "bc81f1ba47ef5cc68ad32225c3d0e70b8c6f6077663835438da8d5733f917598",
         # bazelbuild/rules_cc
@@ -228,9 +228,8 @@ distdir_tar(
             "https://mirror.bazel.build/bazel_android_tools/android_tools_pkg-0.14.tar.gz",
         ],
         # bazelbuild/platforms
-        "46993efdd33b73649796c5fc5c9efb193ae19d51.zip": [
-            "https://mirror.bazel.build/github.com/bazelbuild/platforms/archive/46993efdd33b73649796c5fc5c9efb193ae19d51.zip",
-            "https://github.com/bazelbuild/platforms/archive/46993efdd33b73649796c5fc5c9efb193ae19d51.zip",
+        "3797fb623ef179ee131dbbde09af0eb96574fb6d.zip": [
+            "https://github.com/siepkes/platforms/archive/3797fb623ef179ee131dbbde09af0eb96574fb6d.zip",
         ],
         # bazelbuild/rules_java
         "7cf3cefd652008d0a64a419c34c13bdca6c8f178.zip": [
@@ -501,7 +500,7 @@ distdir_tar(
         "zulu11.29.3-ca-jdk11.0.2-win_x64.zip",
         "android_tools_pkg-0.14.tar.gz",
         # bazelbuild/platforms
-        "46993efdd33b73649796c5fc5c9efb193ae19d51.zip",
+        "3797fb623ef179ee131dbbde09af0eb96574fb6d.zip",
         # bazelbuild/rules_java
         "7cf3cefd652008d0a64a419c34c13bdca6c8f178.zip",
         # bazelbuild/rules_cc
@@ -532,7 +531,7 @@ distdir_tar(
         "zulu11.29.3-ca-jdk11.0.2-win_x64.zip": "e1f5b4ce1b9148140fae2fcfb8a96d1c9b7eac5b8df0e13fbcad9b8561284880",
         "android_tools_pkg-0.14.tar.gz": "a3a951838448483e7af25afd10671b266cc6283104b4a2a427d31cac12cf0912",  # built at 6c63d70ef9c11a662b8323c0ae4f6d3ac53b1a60
         # bazelbuild/platforms
-        "46993efdd33b73649796c5fc5c9efb193ae19d51.zip": "66184688debeeefcc2a16a2f80b03f514deac8346fe888fb7e691a52c023dd88",
+        "3797fb623ef179ee131dbbde09af0eb96574fb6d.zip": "cbb55c9290bbdcff31a7d1b852662fa2e7378d7b5b7f52afbf1b3e710b8cf841",
         # bazelbuild/rules_java
         "7cf3cefd652008d0a64a419c34c13bdca6c8f178.zip": "bc81f1ba47ef5cc68ad32225c3d0e70b8c6f6077663835438da8d5733f917598",
         # bazelbuild/rules_cc
@@ -564,9 +563,8 @@ distdir_tar(
             "https://mirror.bazel.build/bazel_android_tools/android_tools_pkg-0.14.tar.gz",
         ],
         # bazelbuild/platforms
-        "46993efdd33b73649796c5fc5c9efb193ae19d51.zip": [
-            "https://mirror.bazel.build/github.com/bazelbuild/platforms/archive/46993efdd33b73649796c5fc5c9efb193ae19d51.zip",
-            "https://github.com/bazelbuild/platforms/archive/46993efdd33b73649796c5fc5c9efb193ae19d51.zip",
+        "3797fb623ef179ee131dbbde09af0eb96574fb6d.zip": [
+            "https://github.com/siepkes/platforms/archive/3797fb623ef179ee131dbbde09af0eb96574fb6d.zip",
         ],
         # bazelbuild/rules_java
         "7cf3cefd652008d0a64a419c34c13bdca6c8f178.zip": [
@@ -645,11 +643,10 @@ http_archive(
 
 http_archive(
     name = "platforms",
-    sha256 = "66184688debeeefcc2a16a2f80b03f514deac8346fe888fb7e691a52c023dd88",
-    strip_prefix = "platforms-46993efdd33b73649796c5fc5c9efb193ae19d51",
+    sha256 = "cbb55c9290bbdcff31a7d1b852662fa2e7378d7b5b7f52afbf1b3e710b8cf841",
+    strip_prefix = "platforms-3797fb623ef179ee131dbbde09af0eb96574fb6d",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/platforms/archive/46993efdd33b73649796c5fc5c9efb193ae19d51.zip",
-        "https://github.com/bazelbuild/platforms/archive/46993efdd33b73649796c5fc5c9efb193ae19d51.zip",
+        "https://github.com/siepkes/platforms/archive/3797fb623ef179ee131dbbde09af0eb96574fb6d.zip",
     ],
 )
 

@@ -237,6 +237,38 @@
 #else /* _LP64 */
 #define GPR_ARCH_32 1
 #endif /* _LP64 */
+#elif defined(__sun)
+#define GPR_PLATFORM_STRING "solaris"
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE
+#endif
+#define GPR_SOLARIS 1
+#define GPR_CPU_POSIX 1
+#define GPR_GCC_ATOMIC 1
+#define GPR_GCC_TLS 1
+#define GPR_POSIX_LOG 1
+#define GPR_POSIX_ENV 1
+#define GPR_POSIX_TMPFILE 1
+#define GPR_POSIX_STRING 1
+#define GPR_POSIX_SUBPROCESS 1
+#define GPR_POSIX_SYNC 1
+#define GPR_POSIX_TIME 1
+#define GPR_GETPID_IN_UNISTD_H 1
+#define GPR_SUPPORT_CHANNELS_FROM_FD 1
+#define GPR_HAVE_ARPA_NAMESER 1
+#define GPR_HAVE_IFADDRS 1
+#define GPR_HAVE_IPV6_RECVPKTINFO 1
+#define GPR_HAVE_UNIX_SOCKET 1
+#define GPR_POSIX_FORK 1
+#define GPR_POSIX_NO_SPECIAL_WAKEUP_FD 1
+#define GPR_POSIX_SOCKET 1
+#define GPR_POSIX_SOCKETADDR 1
+#define GPR_POSIX_SOCKETUTILS 1
+#define GPR_POSIX_WAKEUP_FD 1
+#define GPR_TIMER_USE_GENERIC 1
+// Event ports are not implemented so this is our best option.
+#define GPR_POSIX_MULTIPOLL_WITH_POLL 1
+#define GPR_ARCH_64 1
 #elif defined(__FreeBSD__)
 #define GPR_PLATFORM_STRING "freebsd"
 #ifndef _BSD_SOURCE
