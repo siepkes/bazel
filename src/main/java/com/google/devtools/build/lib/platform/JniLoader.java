@@ -29,6 +29,7 @@ class JniLoader {
         case LINUX:
         case FREEBSD:
         case OPENBSD:
+        case ILLUMOS:
         case UNKNOWN:
         case DARWIN:
           UnixJniLoader.loadJni();

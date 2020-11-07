@@ -86,8 +86,9 @@ public interface OsPathPolicy {
   static OsPathPolicy getFilePathOs() {
     switch (OS.getCurrent()) {
       case LINUX:
-      case FREEBSD:
+      case FREEBSD:      
       case OPENBSD:
+      case ILLUMOS:
       case UNKNOWN:
         return UnixOsPathPolicy.INSTANCE;
       case DARWIN:

@@ -362,7 +362,9 @@ public class GrpcServerImpl extends CommandServerGrpc.CommandServerImplBase impl
       throws AbruptExitException {
     Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdownHook()));
 
-    // server.pid was written in the C++ launcher after fork() but before exec().
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
+
+    // server.pid was written in the C++ launcher after fork() but before exec() .
     // The client only accesses the pid file after connecting to the socket
     // which ensures that it gets the correct pid value.
     pidFile = serverDirectory.getRelative("server.pid.txt");
@@ -499,6 +501,7 @@ public class GrpcServerImpl extends CommandServerGrpc.CommandServerImplBase impl
 
   private void writeServerStatusFiles(InetSocketAddress address) throws AbruptExitException {
     String addressString = InetAddresses.toUriString(address.getAddress()) + ":" + server.getPort();
+
     writeServerFile(PORT_FILE, addressString);
     writeServerFile(REQUEST_COOKIE_FILE, requestCookie);
     writeServerFile(RESPONSE_COOKIE_FILE, responseCookie);
@@ -678,6 +681,14 @@ public class GrpcServerImpl extends CommandServerGrpc.CommandServerImplBase impl
               InterruptedFailureDetails.detailedExitCode(
                   "Command dispatch interrupted", Interrupted.Code.COMMAND_DISPATCH));
       commandId = ""; // The default value, the client will ignore it
+    } catch (Exception e) {
+      try {
+        java.nio.file.Files.write(java.nio.file.Paths.get("/tmp/bazel_exception.txt"), e.toString().getBytes());      
+      } catch (Exception e2) {
+        e2.printStackTrace();
+      }
+
+      throw e;
     }
     RunResponse.Builder response = RunResponse.newBuilder()
         .setCookie(responseCookie)
@@ -776,4 +787,12 @@ public class GrpcServerImpl extends CommandServerGrpc.CommandServerImplBase impl
         .setGrpcServer(GrpcServer.newBuilder().setCode(detailedCode))
         .build();
   }
+  
+  private static final class UncaughtExceptionLogger implements Thread.UncaughtExceptionHandler {
+		@Override
+		public void uncaughtException(Thread thread, Throwable e) {
+			System.err.println("Thread '" + thread.getName() + "' with id " + thread.getId() + " exited because of an uncaught exception.");
+      e.printStackTrace();
+		}
+	}
 }

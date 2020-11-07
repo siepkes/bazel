@@ -50,6 +50,11 @@ bind(
 )
 
 bind(
+    name = "jni_md_header-illumos",
+    actual = "@local_jdk//:jni_md_header-illumos",
+)
+
+bind(
     name = "java",
     actual = "@local_jdk//:java",
 )

@@ -278,6 +278,7 @@ public class BazelRepositoryModule extends BlazeModule {
                           + repositoryCachePath.toString()
                           + ": "
                           + e.getMessage()));
+          e.printStackTrace();
         }
       }
 
